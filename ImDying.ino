@@ -33,6 +33,8 @@ char* fileNameArr[256];
 
 bool ledstate = HIGH;
 
+bool diagMode = false;
+
 void setup() {
   Serial.begin(9600);
 
@@ -54,20 +56,25 @@ void setup() {
   // Set up pins for buttons 
   pinMode(BIG_RED_BUTTON, INPUT_PULLUP);
   pinMode(OPEN_SWITCH, INPUT_PULLUP);
-  pinMode(LIGHT, OUTPUT);
   pinMode(13, OUTPUT);
+  pinMode(LIGHT, OUTPUT);
 
-  // Turn on the big red button light
-  digitalWrite(LIGHT, HIGH);
   digitalWrite(13, LOW);
+  digitalWrite(LIGHT, HIGH);
 
-  Serial.print("\ntest random file name: ");
-  Serial.println(randFilename());
+  // branch to diagnostics mode if button low at end of setup
+  if (digitalRead(BIG_RED_BUTTON) == LOW){
+    diagMode = true;
+    Serial.println("Welcome to diagnostic mode. I do nothing.");
+    diag();
+  } else {
+    Serial.println("Booting into dyingOS...");
+  }
+  
 } /* end setup() */
 
 void loop() {
-
-  // put your main code here, to run repeatedly:
+  // big red button
   if (bigRedButton.update()){
      if(bigRedButton.fallingEdge()){
       playFile (randFilename());
